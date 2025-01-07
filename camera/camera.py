@@ -17,6 +17,10 @@ import open3d as o3d
 
 import copy
 
+def save_img_to_file(img, file_name="rgb_img.txt"):
+    with open(file_name, "a") as file:
+        file.write(str(img))  # 코드 블록을 파일에 저장
+
 class IntelCamera:
     def __init__(self, cfg):
         
@@ -40,10 +44,10 @@ class IntelCamera:
         if self.device_product_line == 'L500':
             self.config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
             self.config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-        
+        # 1280 x 720
         else:
-            self.config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-            self.config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+            self.config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 6)
+            self.config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 6)
 
         self.profile = self.pipeline.start(self.config)
         depth_sensor = self.profile.get_device().first_depth_sensor()
@@ -76,7 +80,7 @@ class IntelCamera:
         frames = self.align.process(frames)
         depth_frame = frames.get_depth_frame()
         color_frame = frames.get_color_frame()
-
+    
         ## filter depth frame
         # depth_frame = self.spatial_filter.process(depth_frame)
         # depth_frame = self.hole_filling_filter.process(depth_frame)
@@ -115,7 +119,8 @@ if __name__ == '__main__':
     while 1:
         rgb_img, depth_img = cam.stream()
         # cam.detectAruco()
-
+        save_img_to_file(rgb_img, file_name="rgb_img.txt")
+ 
         # print(cam.cam2marker)
         # print(np.average(depth_img*0.00025))
         # xyz = cam.generate(depth_img)
